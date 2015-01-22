@@ -139,6 +139,18 @@ BattleEngine.prototype.levelRating = function(pw, pl, _gameResult)
 	}
 };
 
+BattleEngine.prototype.levelDrop = function(p)
+{
+	var updateValue;
+
+	this.playerStore = {};
+	this.playerStore = p;
+
+	updateValue = Math.round(Math.abs(p.rating - (p.rating * 0.4)));
+
+	this.playerStore.rating = updateValue;
+}
+
 BattleEngine.prototype.attack = function(p1, p2)
 {
 	var resultString = "";
@@ -199,30 +211,26 @@ BattleEngine.prototype.attack = function(p1, p2)
 	if(this.strike_p1 === this.strike_p2)
 	{
 		battle_resultString = "DRAW";
-
-		this.gameStats.draw++;
 	}
 
 	// WIN
 	else if(this.strike_p1 > this.strike_p2)
 	{
 		battle_resultString = "WIN";
-
-		this.gameStats.win++;
 	}
 
 	// LOSE
 	else if(this.strike_p1 < this.strike_p2)
 	{
 		battle_resultString = "LOSE";
-
-		this.gameStats.lose++;
 	}
 
 	else
 	{
 		// ERROR ?
 	}
+
+	this.update_stats(battle_resultString);
 
 	return battle_resultString;
 };
@@ -236,13 +244,11 @@ function init(event)
 	player1 = {};
 	player2 = {};
 
-  player1.rating = 34;
-  player2.rating = 20;
+  player1.rating = 30;
+  player2.rating = 40;
 
   battleEngine = new BattleEngine();
   battleEngine.setDifficulty({e:0, m:40, h:80, s:120});
-
-  // battleEngine.update_stats("PLAY");
 
   run();
 }
@@ -270,7 +276,6 @@ function proto_battleResults()
 	{
 		battleEngine.levelRating(player1, player2, gameResult);
 
-		// player1 = {};
 		player1 = battleEngine.playerStore;
 	}
 
@@ -281,15 +286,13 @@ function proto_battleResults()
 
 	else if(gameResult === "LOSE")
 	{
-		battleEngine.levelRating(player2, player1, gameResult);
+		battleEngine.levelDrop(player1);
+		player1 = battleEngine.playerStore;
 
-		// player2 = {};
+		battleEngine.levelRating(player2, player1, gameResult);
 		player2 = battleEngine.playerStore;
 	}
-
 }
-
-// init();
 
 
 </script>
